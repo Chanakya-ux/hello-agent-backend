@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # ✅ NEW
+from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 import openai
@@ -9,7 +9,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 openai.api_base = os.getenv("OPENAI_API_BASE")
 
 app = Flask(__name__)
-CORS(app)  # ✅ NEW
+CORS(app)
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -26,7 +26,11 @@ def chat():
             {"role": "user", "content": prompt}
         ]
     )
+
     return jsonify({"reply": response.choices[0].message.content})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # ✅ This is the Render-compatible part:
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
