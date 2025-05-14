@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My AI Agent</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f4f4f4; }
+        #chat-box { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+        .message { margin: 10px 0; }
+        .user { color: blue; }
+        .bot { color: green; }
+    </style>
+</head>
+<body>
+    <div id="chat-box">
+        <h2>🤖 AI Agent Chat</h2>
+        <div id="chat-log"></div>
+        <input type="text" id="message-input" placeholder="Type your message..." style="width: 80%;">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById("message-input");
+            const message = input.value.trim();
+            if (!message) return;
+
+            appendToChat("👤 You", message, "user");
+
+            input.value = "";
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+                appendToChat("🤖 Agent", data.reply, "bot");
+
+            } catch (err) {
+                appendToChat("⚠️ Error", "Couldn't reach the agent.", "bot");
+            }
+        }
+
+        function appendToChat(sender, text, className) {
+            const log = document.getElementById("chat-log");
+            const msg = document.createElement("div");
+            msg.className = `message ${className}`;
+            msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+            log.appendChild(msg);
+            log.scrollTop = log.scrollHeight;
+        }
+    </script>
+</body>
+</html>
